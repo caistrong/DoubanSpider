@@ -15,7 +15,7 @@ class DoubanSpiderItem(scrapy.Item):
 
 class DoubanMovieItem(scrapy.Item):
     
-    title = scrapy.Field() # from API
+    title = scrapy.Field(serializer=str) # from API
     directors = scrapy.Field() # from API
     actors = scrapy.Field() # from API
     year = scrapy.Field() #from HTML Page
@@ -41,3 +41,4 @@ class DoubanMovieItem(scrapy.Item):
     posterX = scrapy.Field() # from API
     posterY = scrapy.Field() # from API
     doubanUrl = scrapy.Field() # from API
+    playLinks = scrapy.Field() # from HTML Page

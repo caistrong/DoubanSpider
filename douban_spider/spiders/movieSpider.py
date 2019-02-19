@@ -11,7 +11,7 @@ class MovieSpider(scrapy.Spider):
     name = "douban_movie"
     headers = {
         'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-        'Cookie':'bid=e_HJMwzsJuw'
+        'Cookie':'bid=e_HJMaweruw'
     }
     allUrls = []
     currentIdx = 0
@@ -36,18 +36,25 @@ class MovieSpider(scrapy.Spider):
     def start_requests(self):
         self.generateAllUrls()
         startUrl = self.allUrls[self.currentIdx]
-        yield scrapy.Request(startUrl, headers=self.headers ,callback=self.collectMovies)
+        yield scrapy.Request(startUrl, headers=self.headers ,callback=self.collectMovies, errback=self.changeCookies)
+    
+    def changeCookies(self, failure):
+        # 记录错误
+        self.logger.error(repr(failure))
+        # 目前错误一般是403错误，更改cookies避开豆瓣反爬虫机制
+        self.headers['Cookie'] = "bid=" + "".join(random.sample(string.ascii_letters + string.digits, 11))
+        # 继续刚刚失败的那个请求
+        yield scrapy.Request(self.allUrls[self.currentIdx], headers=self.headers, callback=self.collectMovies, errback=self.changeCookies)
 
     def collectMovies(self, response):
-        if(response.status != 200):
-            # 生成11位长度的随机bid以规避豆瓣的反爬机制
-            self.headers['Cookie'] = "bid=" + "".join(random.sample(string.ascii_letters + string.digits, 11))
+            
         rspJson = json.loads(response.text)
         moviedatas = rspJson.get('data')
         # 每完成一次请求就增加当前数组下标
         self.currentIdx += 1
         if(len(moviedatas) == 0):
-            yield scrapy.Request(self.allUrls[self.currentIdx], headers=self.headers, callback=self.collectMovies)
+            # 请求allUrls里的下一个链接
+            yield scrapy.Request(self.allUrls[self.currentIdx], headers=self.headers, callback=self.collectMovies, errback=self.changeCookies)
         
         for data in moviedatas:
             il = ItemLoader(item=DoubanMovieItem(), response=response)
@@ -63,9 +70,9 @@ class MovieSpider(scrapy.Spider):
             il.add_value('doubanId', data.get('id'))
             mi = il.load_item()
             # data.get('url') 是豆瓣电影详情页面
-            yield scrapy.Request(data.get('url'), headers=self.headers, callback=self.parseDetailHtml, meta={'movieItem': mi})
+            yield scrapy.Request(data.get('url'), headers=self.headers, callback=self.parseDetailHtml, meta={'movieItem': mi}, errback=self.changeCookies)
 
-        yield scrapy.Request(self.allUrls[self.currentIdx], headers=self.headers, callback=self.collectMovies)
+        yield scrapy.Request(self.allUrls[self.currentIdx], headers=self.headers, callback=self.collectMovies, errback=self.changeCookies)
 
     def parseDetailHtml(self, response):
         mi = response.meta.get('movieItem')
@@ -88,6 +95,7 @@ class MovieSpider(scrapy.Spider):
         il.add_xpath('twoStarRatio', '//div[@class="ratings-on-weight"]/div[4]/span[@class="rating_per"]/text()')
         il.add_xpath('oneStarRatio', '//div[@class="ratings-on-weight"]/div[5]/span[@class="rating_per"]/text()')
         il.add_xpath('summary', '//span[@property="v:summary"]/text()')
+        il.add_xpath('playLinks', '//ul[@class="bs"]/li/a', re='data-cn=(.*) href=(.*)')
     
         return il.load_item()
 
