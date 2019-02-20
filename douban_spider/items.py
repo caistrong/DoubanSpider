@@ -6,39 +6,78 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-
-
-class DoubanSpiderItem(scrapy.Item):
+from scrapy.loader.processors import TakeFirst
+class DoubanMovieItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
-
-class DoubanMovieItem(scrapy.Item):
-    
-    title = scrapy.Field(serializer=str) # from API
-    directors = scrapy.Field() # from API
-    actors = scrapy.Field() # from API
-    year = scrapy.Field() #from HTML Page
-    screenwriters = scrapy.Field() # from HTML Page
-    types = scrapy.Field() # from HTML Page
-    nations = scrapy.Field() # from HTML Page
-    languages = scrapy.Field() # from HTML Page
-    releaseDate = scrapy.Field() # from HTML Page
-    duration = scrapy.Field() # from HTML Page
-    knownAs = scrapy.Field() # from HTML Page
-    doubanId = scrapy.Field() # from API
-    imdbId = scrapy.Field() # from HTML Page
-    posterUrl = scrapy.Field() # from API
-    rate = scrapy.Field() # from API
-    star = scrapy.Field() # from API
-    votesNum = scrapy.Field() # from HTML Page
-    fiveStarRatio = scrapy.Field() # from HTML Page
-    fourStarRatio = scrapy.Field() # from HTML Page
-    threeStarRatio = scrapy.Field() # from HTML Page
-    twoStarRatio = scrapy.Field() # from HTML Page
-    oneStarRatio = scrapy.Field() # from HTML Page
-    summary = scrapy.Field() # from HTML Page
-    posterX = scrapy.Field() # from API
-    posterY = scrapy.Field() # from API
-    doubanUrl = scrapy.Field() # from API
-    playLinks = scrapy.Field() # from HTML Page
+    title = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    directors = scrapy.Field(serializer=str) # from API
+    actors = scrapy.Field(serializer=str) # from API
+    year = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) #from HTML Page
+    screenwriters = scrapy.Field(serializer=str) # from HTML Page
+    types = scrapy.Field(serializer=str) # from HTML Page
+    nations = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    languages = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    releaseDate = scrapy.Field(serializer=str) # from HTML Page
+    duration = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    knownAs = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    doubanId = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    imdbId = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    posterUrl = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    rate = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    star = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    votesNum = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    fiveStarRatio = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    fourStarRatio = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    threeStarRatio = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    twoStarRatio = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    oneStarRatio = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    summary = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from HTML Page
+    posterX = scrapy.Field(
+        serializer=str,
+        output_processor=TakeFirst(),
+    ) # from API
+    posterY = scrapy.Field(
+        serializer=str,
+        output_processor=TakeFirst(),
+    ) # from API
+    doubanUrl = scrapy.Field(
+        output_processor=TakeFirst(),
+    ) # from API
+    playLinks = scrapy.Field(serializer=str) # from HTML Page

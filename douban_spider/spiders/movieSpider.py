@@ -6,7 +6,6 @@ from urllib.parse import urlencode
 from scrapy.loader import ItemLoader
 from douban_spider.items import DoubanMovieItem
 
-
 class MovieSpider(scrapy.Spider):
     name = "douban_movie"
     headers = {
@@ -35,6 +34,10 @@ class MovieSpider(scrapy.Spider):
         
     def start_requests(self):
         self.generateAllUrls()
+        # 从上次程序中断时的url index开始往下读取
+        with open('last_success.json') as f:
+            last_success = json.load(f)
+            self.currentIdx = last_success.get('urlListIndex') - 1
         startUrl = self.allUrls[self.currentIdx]
         yield scrapy.Request(startUrl, headers=self.headers ,callback=self.collectMovies, errback=self.changeCookies)
     
@@ -87,7 +90,7 @@ class MovieSpider(scrapy.Spider):
         il.add_xpath('releaseDate', '//span[@property="v:initialReleaseDate"]/text()')
         il.add_xpath('duration', '//span[@property="v:runtime"]/text()')
         il.add_xpath('knownAs', '//div[@id="info"]', re='又名:</span>.*?(.*)<')
-        il.add_xpath('imdbId', '//div[@id="info"]/a[@rel="nofollow"]/text()')
+        il.add_xpath('imdbId', '//div[@id="info"]/a[@rel="nofollow"]/text()', re='(tt\\d+)')
         il.add_xpath('votesNum', '//span[@property="v:votes"]/text()')
         il.add_xpath('fiveStarRatio', '//div[@class="ratings-on-weight"]/div[1]/span[@class="rating_per"]/text()')
         il.add_xpath('fourStarRatio', '//div[@class="ratings-on-weight"]/div[2]/span[@class="rating_per"]/text()')
@@ -95,7 +98,14 @@ class MovieSpider(scrapy.Spider):
         il.add_xpath('twoStarRatio', '//div[@class="ratings-on-weight"]/div[4]/span[@class="rating_per"]/text()')
         il.add_xpath('oneStarRatio', '//div[@class="ratings-on-weight"]/div[5]/span[@class="rating_per"]/text()')
         il.add_xpath('summary', '//span[@property="v:summary"]/text()')
-        il.add_xpath('playLinks', '//ul[@class="bs"]/li/a', re='data-cn=(.*) href=(.*)')
+        provider = response.xpath('//ul[@class="bs"]/li/a/@data-cn').getall()
+        url = response.xpath('//ul[@class="bs"]/li/a/@href').getall()
+        playLinks = []
+        for i, val in enumerate(provider):
+            playLinks.append({
+                val: url[i]
+            })
+        il.add_value('playLinks', playLinks)
     
         return il.load_item()
 

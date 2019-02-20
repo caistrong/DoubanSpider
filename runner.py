@@ -5,9 +5,7 @@ try:
         [
             'scrapy',
             'crawl',
-            'douban_movie',
-            '-o',
-            'movies.jl',
+            'douban_movie'
         ]
     )
 except SystemExit:

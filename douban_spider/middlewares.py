@@ -6,7 +6,15 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import requests
 
+# 动态的代理池
+class DynamicProxyMiddleware(object):
+    def process_request(self,request, spider):
+        proxy = requests.get("http://123.207.35.36:5010/get/").content.decode('UTF-8')
+        print('you are using proxy {p}'.format(p=proxy))
+        proxyUrl = 'https://{proxy}'.format(proxy=proxy)
+        request.meta['proxy'] = proxyUrl
 
 class DoubanSpiderSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,

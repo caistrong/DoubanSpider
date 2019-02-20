@@ -90,7 +90,13 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # 我的自定义配置
+
 FEED_EXPORT_ENCODING = 'utf-8'
+# DOWNLOAD_DELAY = 2 # 延迟10秒防止被封IP
+
+ITEM_PIPELINES = {
+    'douban_spider.pipelines.MySQLStorePipeLine': 100,#保存到mysql数据库
+}
 
 # scrapy_proxies库的配置
 # Retry many times since proxies often fail
@@ -101,6 +107,7 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
     'scrapy_proxies.RandomProxy': 100,
+    # 'douban_spider.middlewares.DynamicProxyMiddleware': 100,
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
 }
 
