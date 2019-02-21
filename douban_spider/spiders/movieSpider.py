@@ -29,7 +29,7 @@ class MovieSpider(scrapy.Spider):
                 start = str(i)
                 formdata['range'] = score
                 formdata['start'] = start
-                url = 'http://movie.douban.com/j/new_search_subjects?' + urlencode(formdata)
+                url = 'https://movie.douban.com/j/new_search_subjects?' + urlencode(formdata)
                 self.allUrls.append(url)
         
     def start_requests(self):
@@ -37,7 +37,8 @@ class MovieSpider(scrapy.Spider):
         # 从上次程序中断时的url index开始往下读取
         with open('last_success.json') as f:
             last_success = json.load(f)
-            self.currentIdx = last_success.get('urlListIndex') - 1
+            last_urlIndex = last_success.get('urlListIndex')
+            self.currentIdx = last_urlIndex or 0
         startUrl = self.allUrls[self.currentIdx]
         yield scrapy.Request(startUrl, headers=self.headers ,callback=self.collectMovies, errback=self.changeCookies)
     
@@ -63,7 +64,7 @@ class MovieSpider(scrapy.Spider):
             il = ItemLoader(item=DoubanMovieItem(), response=response)
             il.add_value('title', data.get('title'))
             il.add_value('directors', data.get('directors'))
-            il.add_value('rate', data.get('rate'))
+            il.add_value('rate', float(data.get('rate')) * 10)
             il.add_value('star', data.get('star'))
             il.add_value('posterUrl', data.get('cover'))
             il.add_value('posterX', data.get('cover_x'))

@@ -91,8 +91,9 @@ ROBOTSTXT_OBEY = True
 
 # 我的自定义配置
 
+ROBOTSTXT_OBEY = False
 FEED_EXPORT_ENCODING = 'utf-8'
-# DOWNLOAD_DELAY = 2 # 延迟10秒防止被封IP
+DOWNLOAD_DELAY = 11 # 延迟11秒防止被封IP
 
 ITEM_PIPELINES = {
     'douban_spider.pipelines.MySQLStorePipeLine': 100,#保存到mysql数据库
@@ -104,11 +105,15 @@ RETRY_TIMES = 3
 # Retry on most error codes since proxies fail for different reasons
 RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
+#set RANDOM_UA_PER_PROXY to True to allow switch per proxy
+RANDOM_UA_PER_PROXY = True
+
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
     'scrapy_proxies.RandomProxy': 100,
     # 'douban_spider.middlewares.DynamicProxyMiddleware': 100,
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware':120
 }
 
 # Proxy list containing entries like

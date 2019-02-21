@@ -42,7 +42,7 @@ class MySQLStorePipeLine(object):
                     item.get('imdbId').encode('utf-8'),
                     item.get('posterUrl').encode('utf-8'),
                     item.get('star').encode('utf-8'),
-                    item.get('rate').encode('utf-8'),
+                    str(item.get('rate')).encode('utf-8'),
                     item.get('votesNum').encode('utf-8'),
                     item.get('fiveStarRatio').encode('utf-8'),
                     item.get('fourStarRatio').encode('utf-8'),
