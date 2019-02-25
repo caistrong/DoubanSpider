@@ -1,2 +1,0 @@
-https://movie.douban.com/j/new_search_subjects?sort=T&range=9%2C10&tags=%E7%94%B5%E5%BD%B1&start=0
-https://movie.douban.com/j/new_search_subjects?sort=T&range=9%2C10&tags=%E7%94%B5%E5%BD%B1&start=20
